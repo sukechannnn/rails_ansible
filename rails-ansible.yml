@@ -1,0 +1,23 @@
+- name: setting rails to server
+  hosts: rails-ansible
+  user: vagrant
+
+  vars:
+    app_name: myapp
+    environme: vagrant
+    mysql_port: 3306
+    home: /home/{{user}}
+    user: vagrant
+    src_dir: /usr/local/src
+    ruby_version: 2.2.3
+    rbenv_root: "{{ home }}/.rbenv"
+    rails_version: 4.2.1
+  roles:
+    - common
+    - rbenv-install
+    - bundler
+    - mysql
+    - nodejs
+    - phantomjs
+    - nginx-install
+    - redis

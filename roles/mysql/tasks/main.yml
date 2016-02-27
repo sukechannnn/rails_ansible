@@ -1,0 +1,21 @@
+---
+- name: mysql-server is installed
+  sudo: yes
+  yum: name={{ item }} state=present
+  with_items:
+    - mysql-server
+    - MySQL-python
+  tags: mysqld
+
+- name: mysqld is running and enabled
+  sudo: yes
+  service: name=mysqld state=running enabled=yes
+  tags: mysqld
+
+- name: create mysqld root user
+  sudo: yes
+  mysql_user:
+    name: root
+    host: localhost
+    password: ""
+  tags: mysqld

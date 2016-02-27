@@ -1,0 +1,9 @@
+---
+
+- name: install redis
+  sudo: yes
+  yum: name=redis enablerepo=epel state=present
+
+- name: redis start
+  sudo: yes
+  command: /etc/init.d/redis start

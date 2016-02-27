@@ -1,0 +1,29 @@
+---
+- name: Install rbenv
+  git: repo=https://github.com/sstephenson/rbenv.git dest={{ rbenv_root }}
+  tags:
+    - rbenv
+
+- name: Install ruby-build
+  git: repo=https://github.com/sstephenson/ruby-build.git dest={{ rbenv_root }}/plugins/ruby-build
+  tags:
+    - rbenv
+
+- name: Set rbenv env file
+  copy: src=rbenv.sh dest=/home/{{ user }}/.bashrc
+
+- name: Check if version is installed ruby
+  shell: rbenv versions | grep {{ ruby_version }}
+  register: ruby_installed
+  changed_when: False
+  ignore_errors: yes
+
+- name: Install ruby with rbenv
+  shell: rbenv install {{ ruby_version }}
+  when:
+    - ruby_installed.rc != 0
+
+- name: "set ruby {{ ruby_version }} for system"
+  shell: rbenv global {{ ruby_version }} && rbenv rehash
+  when:
+    - ruby_installed.rc != 0

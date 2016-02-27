@@ -1,0 +1,16 @@
+---
+- name: bundler install
+  gem: name=bundler state=latest executable={{ home }}/.rbenv/shims/gem user_install=no
+
+- name: bundler rehash
+  shell: rbenv rehash
+
+- name: Check if version is installed Rails
+  shell: rails -v | grep Rails {{ rails_version }}
+  register: rails_installed
+  changed_when: False
+  ignore_errors: yes
+
+- name: Install Rails
+  shell: gem Install rails -v {{ rails_version }}
+  when: rails_installed.rc != 0

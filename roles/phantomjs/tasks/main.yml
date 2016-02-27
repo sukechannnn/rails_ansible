@@ -1,0 +1,24 @@
+---
+- name: Check if version is installed phantomjs
+  shell: phantomjs -v | grep 1.9.8
+  register: phantomjs_installed
+  changed_when: False
+  ignore_errors: yes
+
+- name: download phantomjs
+  sudo: yes
+  get_url: url=https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.8-linux-x86_64.tar.bz2 dest=/usr/local/src
+  when:
+    - phantomjs_installed.rc != 0
+
+- name: unarchive phantomjs
+  sudo: yes
+  unarchive: src=/usr/local/src/phantomjs-1.9.8-linux-x86_64.tar.bz2 copy=no dest=/usr/local/src/
+  when:
+    - phantomjs_installed.rc != 0
+
+- name: copy phantomjs
+  sudo: yes
+  command: cp /usr/local/src/phantomjs-1.9.8-linux-x86_64/bin/phantomjs /usr/local/bin/
+  when:
+    - phantomjs_installed.rc != 0

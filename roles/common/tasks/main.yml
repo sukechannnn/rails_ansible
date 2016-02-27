@@ -1,0 +1,76 @@
+# common setting
+- name: install python-selinux
+  sudo: yes
+  yum: pkg=libselinux-python state=latest
+- name: disable selinux
+  sudo: yes
+  selinux: state=disabled
+
+- name: disallow root SSH access
+  sudo: yes
+  lineinfile: dest=/etc/ssh/sshd_config regexp="^#PermitRootLogin " line="PermitRootLogin no" state=present
+  notify: restart sshd
+- name: disallow password authentication
+  sudo: yes
+  lineinfile: dest=/etc/ssh/sshd_config regexp="^#PasswordAuthentication " line="PasswordAuthentication no" state=present
+  notify: restart sshd
+
+- name: add EPEL
+  sudo: yes
+  shell: creates=/etc/yum.repos.d/epel.repo rpm -Uvh --replacepkgs http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+- name: add remi
+  sudo: yes
+  yum: name=http://rpms.famillecollet.com/enterprise/remi-release-6.rpm state=present
+
+- name: Check kernel-devel is installed
+  shell: rpm -qa | grep kernel-devel
+  register: kerneldevel_installed
+  changed_when: False
+  ignore_errors: yes
+
+- name: download kernel-devel
+  sudo: yes
+  get_url: url=ftp://mirror.switch.ch/pool/4/mirror/scientificlinux/6.4/x86_64/updates/security/kernel-devel-2.6.32-358.23.2.el6.x86_64.rpm dest=/usr/local/src
+  when:
+    - kerneldevel_installed.rc != 0
+
+- name: install kernel-devel
+  sudo: yes
+  shell: rpm -ivh /usr/local/src/kernel-devel-2.6.32-358.23.2.el6.x86_64.rpm
+  when:
+    - kerneldevel_installed.rc != 0
+
+- name: install the 'Development tools' package group
+  sudo: yes
+  yum: name="@Development tools" state=present
+
+- name: install basic packages
+  sudo: yes
+  yum: name={{ item }} state=present
+  with_items:
+    - git
+    - curl
+    - wget
+    - tar
+    - make
+    - zlib-devel
+    - ruby-devel
+    - readline-devel
+    - ncurses-devel
+    - gdbm-devel
+    - openssl-devel
+    - libxslt-devel
+    - sqlite-devel
+    - libyaml
+    - libyaml-devel
+    - tcl-devel
+    - db4-devel
+    - libffi-devel
+    - gcc
+    - gcc-c++
+    - libxml2
+    - libxml2-devel
+    - libxslt
+    - libxslt-devel
+    - vim
+    - mysql-devel

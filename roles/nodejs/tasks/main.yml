@@ -1,0 +1,9 @@
+---
+
+- name: Install JavaScript runtime
+  sudo: yes
+  yum: name=npm enablerepo=epel state=present
+
+- name: Install nodejs
+  sudo: yes
+  yum: name=nodejs enablerepo=epel state=present
